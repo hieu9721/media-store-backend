@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(go run:*)"
+      "Bash(go run:*)",
+      "Bash(go get:*)",
+      "Bash(go build:*)",
+      "Bash(make build:*)",
+      "Bash(cmd //c \"build.bat windows\")"
     ],
     "deny": [],
     "ask": []

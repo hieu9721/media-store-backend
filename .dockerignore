@@ -1,0 +1,56 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+build/
+*.exe
+media-store-backend
+
+# Dependencies
+vendor/
+
+# Documentation
+*.md
+!README.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test files
+*_test.go
+test/
+
+# Environment
+.env.local
+.env.*.local
+
+# Scripts
+scripts/
+build.sh
+build.bat
+generate-jwt-secret.sh
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Uploads (để tránh copy uploads vào image)
+uploads/*
+!uploads/.gitkeep

@@ -21,18 +21,50 @@ func SetupRoutes() *gin.Engine {
         })
     })
 
+    // Serve static files (uploaded images)
+    router.Static("/uploads", "./uploads")
+
     // API v1 routes
     v1 := router.Group("/api/v1")
     {
-        // User routes
-        users := v1.Group("/users")
+        // Auth routes (public)
+        auth := v1.Group("/auth")
         {
-            users.POST("", api.CreateUser)
-            users.GET("", api.GetUsers)
-            users.GET("/search", api.SearchUsers)
-            users.GET("/:id", api.GetUser)
-            users.PUT("/:id", api.UpdateUser)
-            users.DELETE("/:id", api.DeleteUser)
+            auth.POST("/register", api.Register)
+            auth.POST("/login", api.Login)
+        }
+
+        // Protected routes (require authentication)
+        protected := v1.Group("")
+        protected.Use(middleware.AuthRequired())
+        {
+            // Current user
+            protected.GET("/me", api.GetCurrentUser)
+
+            // Upload routes
+            upload := protected.Group("/upload")
+            {
+                upload.POST("/avatar", api.UploadAvatar)           // Upload avatar
+                upload.POST("/image", api.UploadUserImage)         // Upload image to user gallery
+                upload.POST("/video", api.UploadVideo)             // Upload video
+            }
+
+            // User routes (protected)
+            users := protected.Group("/users")
+            {
+                users.GET("", api.GetUsers)
+                users.GET("/search", api.SearchUsers)
+                users.GET("/:id", api.GetUser)
+                users.PUT("/:id", api.UpdateUser)
+            }
+
+            // Admin only routes
+            admin := users.Group("")
+            admin.Use(middleware.AdminRequired())
+            {
+                admin.POST("", api.CreateUser)
+                admin.DELETE("/:id", api.DeleteUser)
+            }
         }
     }
 
