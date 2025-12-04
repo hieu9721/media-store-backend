@@ -3,3 +3,6 @@
 
 # Upload
 /uploads 
+
+# docker-volumes
+/docker-volumes

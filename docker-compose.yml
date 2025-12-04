@@ -1,65 +1,11 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  # MongoDB Database
-  mongodb:
-    image: mongo:7.0
-    container_name: media-store-mongodb
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_DATABASE: media_store
+  mongo82:
+    image: mongo:8.2
+    container_name: mongo82
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
-      - mongodb_data:/data/db
-      - mongodb_config:/data/configdb
-    networks:
-      - media-store-network
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Backend API
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: media-store-backend
+      - ./docker-volumes/mongo82:/data/db
     restart: unless-stopped
-    ports:
-      - "8080:8080"
-    environment:
-      - MONGODB_URI=mongodb://mongodb:27017
-      - DATABASE_NAME=media_store
-      - PORT=8080
-      - GIN_MODE=release
-      - JWT_SECRET=${JWT_SECRET:-change-this-secret-in-production}
-      - JWT_EXPIRY=24h
-      - UPLOAD_DIR=uploads/avatars
-      - BASE_URL=http://localhost:8080
-    volumes:
-      - ./uploads:/app/uploads
-      - ./.env:/app/.env:ro
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    networks:
-      - media-store-network
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-networks:
-  media-store-network:
-    driver: bridge
-
-volumes:
-  mongodb_data:
-    driver: local
-  mongodb_config:
-    driver: local

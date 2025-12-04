@@ -1,4 +1,4 @@
-# media-store-backend
+# Media store backend
 
 ## install
 
@@ -9,7 +9,11 @@ go mod tidy
 ## Generate JWT secrest key
 
 ```bash
-go run /scripts/generate-jwt-secret.go
+# Windown
+go run .\scripts\generate-jwt-secret.go
+
+# Linux
+go run ./scripts/generate-jwt-secret.go
 ```
 
 ## run
