@@ -49,8 +49,8 @@ func Register(c *gin.Context) {
 		Password:  hashedPassword,
 		Role:      "user",
 		Phone:     input.Phone,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 
 	_, err = collection.InsertOne(ctx, user)

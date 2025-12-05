@@ -39,8 +39,8 @@ func CreateUser(c *gin.Context) {
     }
 
     user.ID = utils.GenerateUserID()
-    user.CreatedAt = time.Now()
-    user.UpdatedAt = time.Now()
+    user.CreatedAt = time.Now().Unix()
+    user.UpdatedAt = time.Now().Unix()
 
     _, err = getUserCollection().InsertOne(ctx, user)
     if err != nil {
@@ -92,14 +92,14 @@ func GetUser(c *gin.Context) {
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()
 
-    userId := c.Param("id")
-    if !utils.IsValidUserID(userId) {
+    userID := c.Param("id")
+    if !utils.IsValidUserID(userID) {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
         return
     }
 
     var user models.User
-    err := getUserCollection().FindOne(ctx, bson.M{"_id": userId}).Decode(&user)
+    err := getUserCollection().FindOne(ctx, bson.M{"_id": userID}).Decode(&user)
     if err != nil {
         if err == mongo.ErrNoDocuments {
             c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
@@ -120,8 +120,8 @@ func UpdateUser(c *gin.Context) {
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()
 
-    userId := c.Param("id")
-    if !utils.IsValidUserID(userId) {
+    userID := c.Param("id")
+    if !utils.IsValidUserID(userID) {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
         return
     }
@@ -134,7 +134,7 @@ func UpdateUser(c *gin.Context) {
 
     // Check if user exists
     var existUser models.User
-    err := getUserCollection().FindOne(ctx, bson.M{"_id": userId}).Decode(&existUser)
+    err := getUserCollection().FindOne(ctx, bson.M{"_id": userID}).Decode(&existUser)
     if err != nil {
         if err == mongo.ErrNoDocuments {
             c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
@@ -157,7 +157,7 @@ func UpdateUser(c *gin.Context) {
     // Build update document
     updateDoc := bson.M{
         "$set": bson.M{
-            "updated_at": time.Now(),
+            "updated_at": time.Now().Unix(),
         },
     }
 
@@ -174,7 +174,7 @@ func UpdateUser(c *gin.Context) {
         updateDoc["$set"].(bson.M)["avatar"] = updateData.Avatar
     }
 
-    _, err = getUserCollection().UpdateOne(ctx, bson.M{"_id": userId}, updateDoc)
+    _, err = getUserCollection().UpdateOne(ctx, bson.M{"_id": userID}, updateDoc)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
         return
@@ -182,7 +182,7 @@ func UpdateUser(c *gin.Context) {
 
     // Get updated user
     var updatedUser models.User
-    getUserCollection().FindOne(ctx, bson.M{"_id": userId}).Decode(&updatedUser)
+    getUserCollection().FindOne(ctx, bson.M{"_id": userID}).Decode(&updatedUser)
 
     c.JSON(http.StatusOK, gin.H{
         "message": "User updated successfully",
@@ -195,13 +195,13 @@ func DeleteUser(c *gin.Context) {
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()
 
-    userId := c.Param("id")
-    if !utils.IsValidUserID(userId) {
+    userID := c.Param("id")
+    if !utils.IsValidUserID(userID) {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
         return
     }
 
-    result, err := getUserCollection().DeleteOne(ctx, bson.M{"_id": userId})
+    result, err := getUserCollection().DeleteOne(ctx, bson.M{"_id": userID})
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
         return

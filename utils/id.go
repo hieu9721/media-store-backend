@@ -6,6 +6,10 @@ import (
 	"github.com/google/uuid"
 )
 
+func GenerateID(pre string) string {
+	return fmt.Sprintf(pre, "_%s", uuid.New().String())
+}
+
 func GenerateUserID() string {
 	return fmt.Sprintf("uid_%s", uuid.New().String())
 }
